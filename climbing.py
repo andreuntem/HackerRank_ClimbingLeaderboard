@@ -1,42 +1,40 @@
 def climbingLeaderboard(scores, alice):
     
-    # create board position:
-    leaderboard = []
-    for i, score in enumerate(scores):
-        if i==0:
-            pos = 1    
-        elif score<scores[i-1]:
-            pos += 1
-        leaderboard.append(pos)
-
-    reversed_scores = scores[::-1]
-    reversed_leaderboard = leaderboard[::-1]
-    length = len(scores)
-
+    # create unique sore in ascending order:
+    board_score = sorted(list(set(scores)))
+    n_board = len(board_score)
     alice_position = []
-    # run through all alice points
-    for score_alice in alice:
-        vec_greater_eq = [reversed_leaderboard[i] if score_alice>=reversed_scores[i] else length for i in range(len(scores))]
-        if sum(vec_greater_eq) == length*length:
-            alice_pos = reversed_leaderboard[0]+1
+
+    # Look for minimum value
+    flag_minimum = [i if alice[0]>board_score[i] else -999 for i in range(n_board)]
+
+    pos_inv = max(max(flag_minimum),0)
+    for alice_score in alice:
+        if alice_score >= max(board_score):
+            position = 1
         else:
-            alice_pos = min(vec_greater_eq)
-
-        #print(vec_greater_eq,' -> ', alice_pos)
-        alice_position.append(alice_pos)
-    
-    #print(alice_position)
-    return alice_position
+            while pos_inv < n_board:
+                score = board_score[pos_inv]
+                if alice_score < score:
+                    position = n_board - pos_inv + 1
+                    break
+                elif alice_score == score:
+                    position = n_board - pos_inv
+                    break
+                pos_inv += 1
         
-
+        alice_position.append(position)
+    
+    return alice_position
+            
 
 
 if __name__ == '__main__':
     str_inp = '''
-    1
-    1
-    2
-    1 1
+    7
+    100 100 50 40 40 20 10
+    4
+    15 25 50 120
     '''
     inp = list(map(int,str_inp.split()))
     n_scores = inp[0]
